@@ -65,7 +65,7 @@ export const AlgorithmComparisonPage: React.FC = () => {
 
   // Switch to the classic Greedy Trap preset
   const handleLoadGreedyTrap = async () => {
-    await switchPreset("greedy_trap");
+    await switchPreset("greedy_trap_benchmark");
     addNotification(
       "warning",
       "Loaded Classic Greedy Trap Counterexample. Watch how Greedy gets stuck while Dinic achieves full flow!"
