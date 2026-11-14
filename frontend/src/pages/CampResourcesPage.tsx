@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Clock,
   Droplet,
+  Edit3,
   HeartPulse,
   HelpCircle,
   Home,
@@ -12,6 +13,8 @@ import {
   PackageCheck,
   Pill,
   RefreshCw,
+  RotateCcw,
+  Save,
   ShieldCheck,
   Sparkles,
   Users,
@@ -29,23 +32,82 @@ import {
 } from "recharts";
 import { api } from "../api/client";
 import { useApp } from "../context/AppContext";
-import type { ReliefAllocationData } from "../types/api";
+import type { ReliefAllocationData, ShelterReliefDemandData } from "../types/api";
+
+interface ShelterInventoryForm {
+  water_liters: number;
+  food_rations: number;
+  medical_supplies: number;
+  blankets: number;
+  medicines: number;
+  hygiene_kits: number;
+}
+
+const RESOURCE_CONFIG = [
+  { key: "water_liters" as const, label: "Clean Water", icon: Droplet, unit: "L", color: "text-blue-600" },
+  { key: "food_rations" as const, label: "Food Rations", icon: Utensils, unit: "meals", color: "text-amber-600" },
+  { key: "medical_supplies" as const, label: "Trauma Kits", icon: HeartPulse, unit: "kits", color: "text-red-600" },
+  { key: "blankets" as const, label: "Bedding / Blankets", icon: Home, unit: "units", color: "text-indigo-600" },
+  { key: "medicines" as const, label: "Essential Meds", icon: Pill, unit: "doses", color: "text-emerald-600" },
+  { key: "hygiene_kits" as const, label: "Hygiene Packs", icon: Sparkles, unit: "packs", color: "text-purple-600" },
+];
 
 export const CampResourcesPage: React.FC = () => {
-  const { reliefOverview, isReliefLoading, refreshRelief, addNotification } = useApp();
+  const { reliefOverview, refreshRelief, addNotification } = useApp();
 
   const [planningDays, setPlanningDays] = useState<number>(3.0);
   const [allocationData, setAllocationData] = useState<ReliefAllocationData | null>(
     reliefOverview?.resources || null
   );
   const [isComputing, setIsComputing] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  // Selected shelter for inventory editing
+  const [selectedShelterId, setSelectedShelterId] = useState<string>("");
+  const [inventoryForm, setInventoryForm] = useState<ShelterInventoryForm>({
+    water_liters: 0,
+    food_rations: 0,
+    medical_supplies: 0,
+    blankets: 0,
+    medicines: 0,
+    hygiene_kits: 0,
+  });
+
+  // Validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Sync with global overview when ready
   useEffect(() => {
-    if (reliefOverview?.resources && planningDays === 3.0) {
+    if (reliefOverview?.resources && planningDays === 3.0 && !allocationData) {
       setAllocationData(reliefOverview.resources);
     }
-  }, [reliefOverview, planningDays]);
+  }, [reliefOverview, planningDays, allocationData]);
+
+  const shelters: ShelterReliefDemandData[] = allocationData?.shelter_allocations || [];
+
+  // Default selected shelter to the first available shelter if not set
+  useEffect(() => {
+    if (shelters.length > 0 && (!selectedShelterId || !shelters.find(s => s.shelter_id === selectedShelterId))) {
+      setSelectedShelterId(shelters[0].shelter_id);
+    }
+  }, [shelters, selectedShelterId]);
+
+  // Synchronize form when selected shelter changes or allocationData updates
+  useEffect(() => {
+    if (!selectedShelterId) return;
+    const currentShelter = shelters.find((s) => s.shelter_id === selectedShelterId);
+    if (currentShelter) {
+      setInventoryForm({
+        water_liters: currentShelter.resources.water_liters?.current_stock ?? 0,
+        food_rations: currentShelter.resources.food_rations?.current_stock ?? 0,
+        medical_supplies: currentShelter.resources.medical_supplies?.current_stock ?? 0,
+        blankets: currentShelter.resources.blankets?.current_stock ?? 0,
+        medicines: currentShelter.resources.medicines?.current_stock ?? 0,
+        hygiene_kits: currentShelter.resources.hygiene_kits?.current_stock ?? 0,
+      });
+      setErrors({});
+    }
+  }, [selectedShelterId, allocationData]);
 
   // Handle duration change
   const handleDurationChange = async (days: number) => {
@@ -62,10 +124,100 @@ export const CampResourcesPage: React.FC = () => {
     }
   };
 
-  const shelters = allocationData?.shelter_allocations || [];
+  // Handle inventory input change
+  const handleInputChange = (field: keyof ShelterInventoryForm, valueString: string) => {
+    const val = valueString === "" ? 0 : parseInt(valueString, 10);
+    const newErrors = { ...errors };
+
+    if (isNaN(val) || val < 0) {
+      newErrors[field] = "Must be a non-negative whole number (≥ 0)";
+    } else {
+      delete newErrors[field];
+    }
+    setErrors(newErrors);
+
+    setInventoryForm((prev) => ({
+      ...prev,
+      [field]: isNaN(val) ? 0 : Math.max(0, val),
+    }));
+  };
+
+  // Reset form to currently saved shelter stock
+  const handleResetForm = () => {
+    const currentShelter = shelters.find((s) => s.shelter_id === selectedShelterId);
+    if (currentShelter) {
+      setInventoryForm({
+        water_liters: currentShelter.resources.water_liters?.current_stock ?? 0,
+        food_rations: currentShelter.resources.food_rations?.current_stock ?? 0,
+        medical_supplies: currentShelter.resources.medical_supplies?.current_stock ?? 0,
+        blankets: currentShelter.resources.blankets?.current_stock ?? 0,
+        medicines: currentShelter.resources.medicines?.current_stock ?? 0,
+        hygiene_kits: currentShelter.resources.hygiene_kits?.current_stock ?? 0,
+      });
+      setErrors({});
+      addNotification("info", `Reset inventory form for ${currentShelter.shelter_name}.`);
+    }
+  };
+
+  // Zero-out inventory for drill testing
+  const handleZeroOut = () => {
+    setInventoryForm({
+      water_liters: 0,
+      food_rations: 0,
+      medical_supplies: 0,
+      blankets: 0,
+      medicines: 0,
+      hygiene_kits: 0,
+    });
+    setErrors({});
+  };
+
+  // Save updated shelter inventory
+  const handleSaveInventory = async () => {
+    if (!selectedShelterId) return;
+
+    // Validate all fields
+    const invalidFields = Object.entries(inventoryForm).some(
+      ([, v]) => typeof v !== "number" || isNaN(v) || v < 0
+    );
+    if (invalidFields || Object.keys(errors).length > 0) {
+      addNotification("error", "Please fix invalid quantities before saving. All values must be non-negative.");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      const updatedAllocation = await api.updateShelterInventory(
+        selectedShelterId,
+        inventoryForm,
+        planningDays
+      );
+      setAllocationData(updatedAllocation);
+      await refreshRelief();
+      const currentShelter = shelters.find((s) => s.shelter_id === selectedShelterId);
+      addNotification(
+        "success",
+        `Physical inventory for ${currentShelter?.shelter_name || selectedShelterId} updated and camp allocations refreshed.`
+      );
+    } catch (err: any) {
+      addNotification("error", `Failed to update shelter inventory: ${err.message || "Network error"}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Quick edit button from shelter card
+  const handleQuickEdit = (shelterId: string) => {
+    setSelectedShelterId(shelterId);
+    const element = document.getElementById("edit-inventory-section");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const selectedShelter = shelters.find((s) => s.shelter_id === selectedShelterId);
   const depotInitial = allocationData?.central_depot_inventory || {};
   const depotAllocated = allocationData?.total_allocated || {};
-  const depotRemaining = allocationData?.depot_remaining_inventory || {};
   const totalDemand = allocationData?.total_demand || {};
   const totalShortages = allocationData?.total_shortages || {};
 
@@ -77,6 +229,8 @@ export const CampResourcesPage: React.FC = () => {
     { name: "Bedding", demand: totalDemand.blankets || 0, stock: depotInitial.blankets || 0, allocated: depotAllocated.blankets || 0, unit: "units" },
     { name: "Hygiene", demand: totalDemand.hygiene_kits || 0, stock: depotInitial.hygiene_kits || 0, allocated: depotAllocated.hygiene_kits || 0, unit: "packs" },
   ];
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <div className="space-y-6">
@@ -94,7 +248,7 @@ export const CampResourcesPage: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Shelter occupant intake forecasting, multi-resource gross demand calculation, and fair-share central depot distribution.
+              Shelter occupant intake forecasting, physical local stock management, gross demand estimation, and fair-share central depot distribution.
             </p>
           </div>
         </div>
@@ -106,7 +260,7 @@ export const CampResourcesPage: React.FC = () => {
             <button
               key={days}
               onClick={() => handleDurationChange(days)}
-              disabled={isComputing}
+              disabled={isComputing || isSaving}
               className={`px-3.5 py-1.5 rounded-lg font-bold transition-all ${
                 planningDays === days
                   ? "bg-amber-600 text-white shadow-xs"
@@ -117,6 +271,194 @@ export const CampResourcesPage: React.FC = () => {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* EDIT SHELTER INVENTORY SECTION */}
+      <div id="edit-inventory-section" className="bg-white border border-blue-200 rounded-2xl p-6 space-y-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-700">
+              <Edit3 className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 tracking-tight">
+                Edit Shelter Physical Inventory
+              </h2>
+              <p className="text-[11px] text-slate-500">
+                Enter physical supplies on-site at emergency camps. Changes automatically recalculate net deficits and depot allocations.
+              </p>
+            </div>
+          </div>
+
+          {/* Shelter Selector Dropdown */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="shelter-select" className="text-xs font-semibold text-slate-600 whitespace-nowrap">
+              Target Shelter:
+            </label>
+            <select
+              id="shelter-select"
+              value={selectedShelterId}
+              onChange={(e) => setSelectedShelterId(e.target.value)}
+              disabled={isSaving}
+              aria-label="Target Shelter"
+              className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {shelters.map((s) => (
+                <option key={s.shelter_id} value={s.shelter_id}>
+                  {s.shelter_name} ({s.shelter_id}) — {s.total_occupants_served} evacuees
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {selectedShelter && (
+          <div className="space-y-4">
+            {/* Shelter Context Info Banner */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-slate-600" />
+                <span className="font-semibold text-slate-700">
+                  {selectedShelter.shelter_name} ({selectedShelter.shelter_id})
+                </span>
+                <span className="text-slate-400">|</span>
+                <span className="text-slate-600">
+                  Total Occupants: <strong className="text-slate-900">{selectedShelter.total_occupants_served.toLocaleString()}</strong> evacuees
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-[11px] font-mono">
+                <span className="text-slate-500">
+                  Autonomy: <strong className="text-blue-700">{selectedShelter.minimum_autonomy_days.toFixed(1)} Days</strong>
+                </span>
+                <span className="text-slate-400">|</span>
+                <span className="text-slate-500">
+                  Deficit Alerts:{" "}
+                  <strong className={selectedShelter.critical_shortages_count > 0 ? "text-amber-700 font-bold" : "text-emerald-700"}>
+                    {selectedShelter.critical_shortages_count} items
+                  </strong>
+                </span>
+              </div>
+            </div>
+
+            {/* 6 Resource Input Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {RESOURCE_CONFIG.map((res) => {
+                const Icon = res.icon;
+                const fieldKey = res.key;
+                const currentVal = inventoryForm[fieldKey];
+                const resData = selectedShelter.resources[fieldKey];
+                const grossDemand = resData?.gross_demand || 0;
+                const netDeficit = Math.max(0, grossDemand - currentVal);
+                const hasFieldError = !!errors[fieldKey];
+
+                return (
+                  <div
+                    key={fieldKey}
+                    className={`p-3.5 rounded-xl border transition-all ${
+                      hasFieldError
+                        ? "bg-red-50/50 border-red-300"
+                        : "bg-slate-50/70 border-slate-200 hover:border-blue-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                        <Icon className={`w-3.5 h-3.5 ${res.color}`} />
+                        <span>{res.label}</span>
+                      </div>
+                      <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
+                        {res.unit}
+                      </span>
+                    </div>
+
+                    {/* Numeric Input */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] uppercase font-semibold text-slate-500 block">
+                        Physical Stock On-Site:
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={currentVal}
+                        onChange={(e) => handleInputChange(fieldKey, e.target.value)}
+                        disabled={isSaving}
+                        className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 ${
+                          hasFieldError
+                            ? "border-red-400 focus:ring-red-400"
+                            : "border-slate-300 focus:ring-blue-500"
+                        }`}
+                        placeholder="0"
+                      />
+                      {hasFieldError && (
+                        <p className="text-[10px] text-red-600 font-semibold mt-0.5">
+                          {errors[fieldKey]}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Live Calculation Preview */}
+                    <div className="mt-2.5 pt-2 border-t border-slate-200/80 text-[11px] font-mono space-y-1 text-slate-600">
+                      <div className="flex justify-between">
+                        <span>Gross Demand:</span>
+                        <span className="font-bold text-slate-900">{grossDemand.toLocaleString()} {res.unit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Net Deficit:</span>
+                        <span className={`font-bold ${netDeficit > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                          {netDeficit > 0 ? `-${netDeficit.toLocaleString()} ${res.unit}` : "0 (Covered)"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetForm}
+                  disabled={isSaving}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset to Saved Stock
+                </button>
+                <button
+                  type="button"
+                  onClick={handleZeroOut}
+                  disabled={isSaving}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  Set All to 0 (Drill)
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveInventory}
+                  disabled={isSaving || hasErrors}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {isSaving ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      Saving &amp; Reallocating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5" />
+                      Save &amp; Recalculate Allocation
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Regional Warehouse Depot Status Bar */}
@@ -139,14 +481,7 @@ export const CampResourcesPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-          {[
-            { key: "water_liters", label: "Clean Water", icon: Droplet, unit: "L" },
-            { key: "food_rations", label: "Food Rations", icon: Utensils, unit: "meals" },
-            { key: "medical_supplies", label: "Trauma Kits", icon: HeartPulse, unit: "kits" },
-            { key: "medicines", label: "Essential Meds", icon: Pill, unit: "doses" },
-            { key: "blankets", label: "Bedding / Blankets", icon: Home, unit: "units" },
-            { key: "hygiene_kits", label: "Hygiene Packs", icon: Sparkles, unit: "packs" },
-          ].map((res) => {
+          {RESOURCE_CONFIG.map((res) => {
             const Icon = res.icon;
             const initial = depotInitial[res.key] || 0;
             const demand = totalDemand[res.key] || 0;
@@ -249,7 +584,16 @@ export const CampResourcesPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => handleQuickEdit(shelter.shelter_id)}
+                    className="px-2.5 py-1 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                    title="Edit physical stock for this shelter"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    Edit Inventory
+                  </button>
+
                   <span
                     className={`text-xs font-bold px-3 py-1 rounded-full border ${
                       shelter.critical_shortages_count > 0
@@ -274,8 +618,9 @@ export const CampResourcesPage: React.FC = () => {
                   <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-mono font-bold border-b border-slate-200">
                     <tr>
                       <th className="py-3 px-3.5">Resource Item</th>
-                      <th className="py-3 px-3.5">Local Stock</th>
+                      <th className="py-3 px-3.5">Local Stock (On-Site)</th>
                       <th className="py-3 px-3.5">Gross Demand</th>
+                      <th className="py-3 px-3.5">Net Deficit</th>
                       <th className="py-3 px-3.5">Allocated from Depot</th>
                       <th className="py-3 px-3.5">Final Camp Stock</th>
                       <th className="py-3 px-3.5">Unmet Shortage</th>
@@ -286,16 +631,20 @@ export const CampResourcesPage: React.FC = () => {
                   <tbody className="divide-y divide-slate-100 font-mono">
                     {Object.entries(shelter.resources).map(([resKey, item]) => {
                       const isShort = item.shortage > 0;
+                      const hasDeficit = item.net_demand > 0;
                       return (
                         <tr key={resKey} className="hover:bg-slate-50/60 transition-colors">
                           <td className="py-3 px-3.5 font-sans font-bold text-slate-900">
                             {item.resource_label}
                           </td>
-                          <td className="py-3 px-3.5 text-slate-600">
+                          <td className="py-3 px-3.5 text-blue-800 font-bold">
                             {item.current_stock.toLocaleString()} {item.unit}
                           </td>
                           <td className="py-3 px-3.5 text-slate-900 font-bold">
                             {item.gross_demand.toLocaleString()} {item.unit}
+                          </td>
+                          <td className={`py-3 px-3.5 font-bold ${hasDeficit ? "text-amber-700" : "text-emerald-700"}`}>
+                            {hasDeficit ? `-${item.net_demand.toLocaleString()} ${item.unit}` : "0 (Covered)"}
                           </td>
                           <td className="py-3 px-3.5 text-emerald-700 font-bold">
                             +{item.allocated_stock.toLocaleString()} {item.unit}

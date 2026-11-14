@@ -285,3 +285,93 @@ def test_api_relief_resources_get_and_post(client):
     post_data = post_resp.json()
     assert post_data["planning_duration_days"] == 5.0
     assert post_data["total_demand"]["water_liters"] > data["total_demand"]["water_liters"]
+
+
+# =====================================================================
+# 7. Edit Shelter Inventory & Local Stock Updating
+# =====================================================================
+
+def test_update_shelter_inventory_success(client):
+    """Test updating on-site physical stock at an existing shelter."""
+    payload = {
+        "water_liters": 4500,
+        "food_rations": 1200,
+        "medical_supplies": 25,
+        "medicines": 80,
+        "blankets": 300,
+        "hygiene_kits": 60,
+    }
+    # Update inventory for S1 Highland Stadium
+    resp = client.put("/api/relief/shelters/S1/inventory?days=3.0", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "shelter_allocations" in data
+
+    s1 = next((s for s in data["shelter_allocations"] if s["shelter_id"] == "S1"), None)
+    assert s1 is not None
+
+    water = s1["resources"]["water_liters"]
+    assert water["current_stock"] == 4500
+    assert water["gross_demand"] > 0
+    # Net deficit should be max(0, gross_demand - current_stock)
+    assert water["net_demand"] == max(0, water["gross_demand"] - 4500)
+    assert water["final_stock"] == water["current_stock"] + water["allocated_stock"]
+
+    food = s1["resources"]["food_rations"]
+    assert food["current_stock"] == 1200
+    assert food["net_demand"] == max(0, food["gross_demand"] - 1200)
+
+    med = s1["resources"]["medical_supplies"]
+    assert med["current_stock"] == 25
+
+
+def test_update_shelter_inventory_negative_validation(client):
+    """Test that negative quantities are rejected by schema validation (422)."""
+    invalid_payload = {
+        "water_liters": -500,  # Negative value violates ge=0
+        "food_rations": 100,
+    }
+    resp = client.put("/api/relief/shelters/S1/inventory", json=invalid_payload)
+    assert resp.status_code == 422
+
+
+def test_update_shelter_inventory_nonexistent_shelter(client):
+    """Test updating inventory for a non-existent shelter ID returns 404."""
+    payload = {"water_liters": 1000}
+    resp = client.put("/api/relief/shelters/NON_EXISTENT_SHELTER/inventory", json=payload)
+    assert resp.status_code == 404
+    assert "not found" in resp.json()["detail"].lower()
+
+
+def test_update_shelter_inventory_non_shelter_node(client):
+    """Test updating inventory on an affected area or junction returns 400."""
+    payload = {"water_liters": 1000}
+    # J1 is a transit junction, not a shelter
+    resp = client.put("/api/relief/shelters/J1/inventory", json=payload)
+    assert resp.status_code == 400
+    assert "not a shelter" in resp.json()["detail"].lower()
+
+
+def test_update_shelter_inventory_persists_in_state(client):
+    """Test that updated shelter inventory persists in subsequent queries."""
+    payload = {
+        "water_liters": 3000,
+        "food_rations": 800,
+        "medical_supplies": 15,
+        "medicines": 50,
+        "blankets": 150,
+        "hygiene_kits": 30,
+    }
+    client.put("/api/relief/shelters/S2/inventory?days=3.0", json=payload)
+
+    # Subsequent GET /api/relief/resources must reflect the persisted local stock
+    get_resp = client.get("/api/relief/resources?days=3.0")
+    assert get_resp.status_code == 200
+    data = get_resp.json()
+
+    s2 = next((s for s in data["shelter_allocations"] if s["shelter_id"] == "S2"), None)
+    assert s2 is not None
+    assert s2["resources"]["water_liters"]["current_stock"] == 3000
+    assert s2["resources"]["food_rations"]["current_stock"] == 800
+    assert s2["resources"]["medical_supplies"]["current_stock"] == 15
+

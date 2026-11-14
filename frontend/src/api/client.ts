@@ -233,6 +233,25 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  updateShelterInventory: (
+    shelterId: string,
+    inventory: {
+      water_liters: number;
+      food_rations: number;
+      medical_supplies: number;
+      medicines: number;
+      blankets: number;
+      hygiene_kits: number;
+    },
+    days = 3
+  ) =>
+    request<ReliefAllocationData>(
+      `/api/relief/shelters/${encodeURIComponent(shelterId)}/inventory?days=${days}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(inventory),
+      }
+    ),
 
   // Export URLs
   exportJsonUrl: `${API_BASE}/api/reports/json`,

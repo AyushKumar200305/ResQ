@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, HTTPException, Query
 
+from resq.domain.enums import NodeType
 from resq.domain.exceptions import EntityNotFoundError, GraphValidationError
 from resq.domain.relief_models import (
     ResourceConsumptionConfig,
@@ -19,6 +20,7 @@ from backend.schemas.relief import (
     ResourceConfigRequest,
     RouteRecommendationSchema,
     ShelterAllocationStatusSchema,
+    ShelterInventoryUpdateRequest,
     ShelterReliefDemandSchema,
     ShelterResourceItemSchema,
     VerifyRoadRequest,
@@ -265,6 +267,58 @@ def get_default_relief_resources(
     """Retrieve relief resource allocations using default consumption assumptions."""
     req = ResourceConfigRequest(planning_duration_days=days)
     return compute_relief_resources(req)
+
+
+@router.put(
+    "/shelters/{shelter_id}/inventory",
+    response_model=ReliefAllocationResponse,
+    summary="Update local physical inventory for a specific shelter",
+)
+def update_shelter_inventory(
+    shelter_id: str,
+    payload: ShelterInventoryUpdateRequest,
+    days: float = Query(default=3.0, ge=0.5, le=14.0, description="Planning duration in days"),
+) -> ReliefAllocationResponse:
+    """Update on-site physical supplies at a shelter, persist in graph state, and return recalculated allocations."""
+    net = state_manager.get_network(make_copy=True)
+    try:
+        node = net.get_node(shelter_id)
+    except EntityNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"Shelter '{shelter_id}' not found.") from exc
+
+    if node.node_type != NodeType.SHELTER:
+        raise HTTPException(status_code=400, detail=f"Node '{shelter_id}' is a {node.node_type.value}, not a shelter.")
+
+    if node.metadata is None:
+        node.metadata = {}
+
+    supplies = {
+        "water_liters": int(payload.water_liters),
+        "food_rations": int(payload.food_rations),
+        "medical_supplies": int(payload.medical_supplies),
+        "medicines": int(payload.medicines),
+        "blankets": int(payload.blankets),
+        "hygiene_kits": int(payload.hygiene_kits),
+    }
+    node.metadata["current_supplies"] = supplies
+    node.metadata["current_inventory"] = supplies
+
+    # Persist in state manager and invalidate stale analysis caches
+    state_manager.set_network(net)
+
+    try:
+        shelter_statuses = assess_shelter_allocations(net)
+        config = ResourceConsumptionConfig(planning_duration_days=days)
+        result = allocate_camp_resources(
+            net,
+            shelter_statuses=shelter_statuses,
+            config=config,
+            planning_duration_days=days,
+        )
+        return _serialize_resources(result)
+    except GraphValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
 
 
 @router.get("/overview", response_model=ReliefOverviewResponse, summary="Unified Relief & Evacuation Decision Support Briefing")

@@ -142,3 +142,15 @@ class VerifyRoadRequest(BaseModel):
     new_status: str = Field(description="verified_clear, unverified_report, hazard_avoid, closed_damaged")
     hazard_risk_score: float | None = Field(default=None, ge=0.0, le=1.0)
     verification_notes: str | None = None
+
+
+class ShelterInventoryUpdateRequest(BaseModel):
+    """Payload to update physical stock available at a specific emergency shelter."""
+
+    water_liters: int = Field(default=0, ge=0, description="Clean drinking water available on-site in liters")
+    food_rations: int = Field(default=0, ge=0, description="Emergency food rations available on-site in meals")
+    medical_supplies: int = Field(default=0, ge=0, description="Trauma and first-aid kits available on-site")
+    medicines: int = Field(default=0, ge=0, description="Essential prescription medicine doses available on-site")
+    blankets: int = Field(default=0, ge=0, description="Emergency bedding units and blankets available on-site")
+    hygiene_kits: int = Field(default=0, ge=0, description="Family hygiene and sanitation packs available on-site")
+
