@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0",
+  "network_id": "metro-flood-baseline",
+  "name": "Metro River Basin Flood (Demo)",
+  "description": "Multi-zone urban flood evacuation across river crossings and two-way arterial links into three regional shelters.",
+  "metadata": {
+    "preset": true,
+    "hazard": "Riverine Flash Flood",
+    "unit": "people/hour"
+  },
+  "nodes": [
+    {
+      "node_id": "A1",
+      "name": "Riverside Ward",
+      "node_type": "affected_area",
+      "population": 1400,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": 3.0,
+      "metadata": {"zone": "North Bank"}
+    },
+    {
+      "node_id": "A2",
+      "name": "Lowland Docks",
+      "node_type": "affected_area",
+      "population": 950,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": 0.0,
+      "metadata": {"zone": "Harbor Basin"}
+    },
+    {
+      "node_id": "A3",
+      "name": "East Delta",
+      "node_type": "affected_area",
+      "population": 750,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": -3.0,
+      "metadata": {"zone": "Delta Flats"}
+    },
+    {
+      "node_id": "J1",
+      "name": "North Causeway",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 3.0,
+      "y": 2.6,
+      "metadata": {}
+    },
+    {
+      "node_id": "J2",
+      "name": "Central Hub",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 3.0,
+      "y": 0.0,
+      "metadata": {}
+    },
+    {
+      "node_id": "J3",
+      "name": "South Bypass",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 3.0,
+      "y": -2.6,
+      "metadata": {}
+    },
+    {
+      "node_id": "J4",
+      "name": "Ridge Interchange",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 6.0,
+      "y": 1.4,
+      "metadata": {}
+    },
+    {
+      "node_id": "J5",
+      "name": "West Viaduct",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 6.0,
+      "y": -1.4,
+      "metadata": {}
+    },
+    {
+      "node_id": "S1",
+      "name": "Highland Stadium",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 1300,
+      "x": 9.0,
+      "y": 2.8,
+      "metadata": {}
+    },
+    {
+      "node_id": "S2",
+      "name": "Civic Arena",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 1100,
+      "x": 9.0,
+      "y": 0.0,
+      "metadata": {}
+    },
+    {
+      "node_id": "S3",
+      "name": "Hilltop Campus",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 900,
+      "x": 9.0,
+      "y": -2.8,
+      "metadata": {}
+    }
+  ],
+  "roads": [
+    {"road_id": "R_A1_J1", "source_id": "A1", "target_id": "J1", "capacity": 800, "name": "North Levee Road", "distance": 4.2, "travel_time_min": 11.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_A1_J2", "source_id": "A1", "target_id": "J2", "capacity": 500, "name": "Riverfront Arterial", "distance": 2.8, "travel_time_min": 14.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_A2_J2", "source_id": "A2", "target_id": "J2", "capacity": 700, "name": "Dockyard Express", "distance": 2.5, "travel_time_min": 9.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_A2_J3", "source_id": "A2", "target_id": "J3", "capacity": 300, "name": "Harbor Spur", "distance": 3.6, "travel_time_min": 12.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_A3_J3", "source_id": "A3", "target_id": "J3", "capacity": 750, "name": "Delta Parkway", "distance": 3.0, "travel_time_min": 10.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J1_J2", "source_id": "J1", "target_id": "J2", "capacity": 250, "name": "Crosstown Southbound", "distance": 2.2, "travel_time_min": 7.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J2_J1", "source_id": "J2", "target_id": "J1", "capacity": 200, "name": "Crosstown Northbound", "distance": 2.2, "travel_time_min": 7.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J1_J4", "source_id": "J1", "target_id": "J4", "capacity": 750, "name": "North Ridgeway Bridge", "distance": 3.8, "travel_time_min": 13.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J2_J4", "source_id": "J2", "target_id": "J4", "capacity": 450, "name": "Central Connector", "distance": 2.4, "travel_time_min": 11.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J2_J5", "source_id": "J2", "target_id": "J5", "capacity": 400, "name": "Midtown Viaduct", "distance": 2.9, "travel_time_min": 12.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J3_J5", "source_id": "J3", "target_id": "J5", "capacity": 650, "name": "South Freeway", "distance": 3.5, "travel_time_min": 14.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J4_S1", "source_id": "J4", "target_id": "S1", "capacity": 950, "name": "Stadium Approach", "distance": 2.0, "travel_time_min": 8.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J4_S2", "source_id": "J4", "target_id": "S2", "capacity": 450, "name": "Civic North Ramp", "distance": 2.4, "travel_time_min": 9.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J5_S2", "source_id": "J5", "target_id": "S2", "capacity": 550, "name": "Civic South Ramp", "distance": 2.1, "travel_time_min": 8.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J5_S3", "source_id": "J5", "target_id": "S3", "capacity": 600, "name": "Campus Ascent", "distance": 2.7, "travel_time_min": 10.0, "is_active": true, "metadata": {}}
+  ]
+}

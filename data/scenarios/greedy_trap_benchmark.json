@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "network_id": "greedy-trap-benchmark",
+  "name": "DAA Benchmark: Greedy Suboptimality Trap",
+  "description": "Canonical DAA counterexample where Shortest-Hop Greedy locks onto the central shortcut (1,000 flow) while Dinic reroutes via residual back-edges to achieve 2,000 optimal flow.",
+  "metadata": {
+    "preset": true,
+    "hazard": "Algorithmic Stress Benchmark"
+  },
+  "nodes": [
+    {"node_id": "A", "name": "Primary Zone A", "node_type": "affected_area", "population": 2000, "shelter_capacity": 0, "x": 0.0, "y": 0.0, "metadata": {}},
+    {"node_id": "J1", "name": "North Relay J1", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 2.4, "y": 1.8, "metadata": {}},
+    {"node_id": "J9", "name": "South Relay J9", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 1.8, "y": -1.8, "metadata": {}},
+    {"node_id": "J2", "name": "South Bridge J2", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 3.8, "y": -1.8, "metadata": {}},
+    {"node_id": "J3", "name": "North Bypass J3", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 4.8, "y": 2.4, "metadata": {}},
+    {"node_id": "J4", "name": "Central Merge J4", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 5.8, "y": -0.4, "metadata": {}},
+    {"node_id": "J5", "name": "North Exit J5", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 7.0, "y": 2.0, "metadata": {}},
+    {"node_id": "S", "name": "Regional Safe Shelter", "node_type": "shelter", "population": 0, "shelter_capacity": 2000, "x": 9.0, "y": 0.0, "metadata": {}}
+  ],
+  "roads": [
+    {"road_id": "R_A_J1", "source_id": "A", "target_id": "J1", "capacity": 1000, "name": "North Entry", "distance": 2.0, "travel_time_min": 8.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J1_J4", "source_id": "J1", "target_id": "J4", "capacity": 1000, "name": "Central Shortcut", "distance": 1.5, "travel_time_min": 6.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J4_S", "source_id": "J4", "target_id": "S", "capacity": 1000, "name": "South Shelter Approach", "distance": 2.0, "travel_time_min": 8.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_A_J9", "source_id": "A", "target_id": "J9", "capacity": 1000, "name": "South Detour Entry", "distance": 2.5, "travel_time_min": 10.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J9_J2", "source_id": "J9", "target_id": "J2", "capacity": 1000, "name": "South Detour Mid", "distance": 2.5, "travel_time_min": 10.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J2_J4", "source_id": "J2", "target_id": "J4", "capacity": 1000, "name": "South Detour Merge", "distance": 2.0, "travel_time_min": 10.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J1_J3", "source_id": "J1", "target_id": "J3", "capacity": 1000, "name": "North Bypass West", "distance": 2.6, "travel_time_min": 11.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J3_J5", "source_id": "J3", "target_id": "J5", "capacity": 1000, "name": "North Bypass East", "distance": 2.6, "travel_time_min": 11.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_J5_S", "source_id": "J5", "target_id": "S", "capacity": 1000, "name": "North Shelter Approach", "distance": 2.3, "travel_time_min": 9.0, "is_active": true, "metadata": {}}
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.0",
+  "network_id": "presentation-demo-dataset",
+  "name": "Metro Disaster Evacuation (College Presentation Demo)",
+  "description": "Realistic synthetic demonstration network featuring 5 hazard zones (5,500 evacuees), 10 transit junctions, 4 regional shelters (5,100 capacity), and 26 directed corridors with alternative paths, shared river bridges, and road & shelter bottlenecks.",
+  "metadata": {
+    "preset": true,
+    "hazard": "Urban Flash Flood & River Overflow",
+    "unit": "people/hour",
+    "prompt": "Prompt 4 College Presentation Demonstration Network",
+    "relief_depot": {
+      "water_liters": 28000,
+      "food_rations": 18000,
+      "medical_kits": 600,
+      "medicines": 1500,
+      "blankets": 4500,
+      "hygiene_kits": 1200
+    }
+  },
+  "nodes": [
+    {
+      "node_id": "A1",
+      "name": "Zone A — Riverside Ward",
+      "node_type": "affected_area",
+      "population": 1200,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": 3.0,
+      "metadata": {
+        "zone": "North Riverbank",
+        "hazard_severity": "critical",
+        "time_to_impact_hours": 1.5,
+        "vulnerable_population": 480
+      }
+    },
+    {
+      "node_id": "A2",
+      "name": "Zone B — Downtown Basin",
+      "node_type": "affected_area",
+      "population": 1500,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": 1.5,
+      "metadata": {
+        "zone": "Commercial Core",
+        "hazard_severity": "high",
+        "time_to_impact_hours": 2.5,
+        "vulnerable_population": 450
+      }
+    },
+    {
+      "node_id": "A3",
+      "name": "Zone C — Harbor District",
+      "node_type": "affected_area",
+      "population": 900,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": 0.0,
+      "metadata": {
+        "zone": "Coastal Wharves",
+        "hazard_severity": "moderate",
+        "time_to_impact_hours": 5.0,
+        "vulnerable_population": 220
+      }
+    },
+    {
+      "node_id": "A4",
+      "name": "Zone D — East Lowlands",
+      "node_type": "affected_area",
+      "population": 1100,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": -1.5,
+      "metadata": {
+        "zone": "Floodplain Residential",
+        "hazard_severity": "high",
+        "time_to_impact_hours": 3.5,
+        "vulnerable_population": 330
+      }
+    },
+    {
+      "node_id": "A5",
+      "name": "Zone E — South Valley",
+      "node_type": "affected_area",
+      "population": 800,
+      "shelter_capacity": 0,
+      "x": 0.0,
+      "y": -3.0,
+      "metadata": {
+        "zone": "Valley Flats",
+        "hazard_severity": "low",
+        "time_to_impact_hours": 8.0,
+        "vulnerable_population": 160
+      }
+    },
+    {
+      "node_id": "J1",
+      "name": "North Causeway",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 2.5,
+      "y": 3.0,
+      "metadata": {}
+    },
+    {
+      "node_id": "J2",
+      "name": "River Junction",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 2.5,
+      "y": 1.5,
+      "metadata": {}
+    },
+    {
+      "node_id": "J3",
+      "name": "Central Junction",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 2.5,
+      "y": 0.0,
+      "metadata": {}
+    },
+    {
+      "node_id": "J4",
+      "name": "South Transit",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 2.5,
+      "y": -1.5,
+      "metadata": {}
+    },
+    {
+      "node_id": "J5",
+      "name": "Valley Point",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 2.5,
+      "y": -3.0,
+      "metadata": {}
+    },
+    {
+      "node_id": "J6",
+      "name": "North Interchange",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 5.5,
+      "y": 2.2,
+      "metadata": {}
+    },
+    {
+      "node_id": "J7",
+      "name": "Metro Hub",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 5.5,
+      "y": 0.8,
+      "metadata": {}
+    },
+    {
+      "node_id": "J8",
+      "name": "East Crossroad",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 5.5,
+      "y": -0.8,
+      "metadata": {}
+    },
+    {
+      "node_id": "J9",
+      "name": "West Viaduct",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 5.5,
+      "y": -2.2,
+      "metadata": {}
+    },
+    {
+      "node_id": "J10",
+      "name": "Ridge Connector",
+      "node_type": "junction",
+      "population": 0,
+      "shelter_capacity": 0,
+      "x": 7.5,
+      "y": 0.0,
+      "metadata": {}
+    },
+    {
+      "node_id": "S1",
+      "name": "North Shelter — Highland Stadium",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 1400,
+      "x": 9.0,
+      "y": 2.8,
+      "metadata": {
+        "current_occupancy": 150,
+        "shelter_type": "stadium",
+        "current_supplies": {
+          "water_liters": 4500,
+          "food_rations": 3000,
+          "medical_kits": 25,
+          "essential_meds_doses": 800,
+          "blankets": 600,
+          "hygiene_kits": 400
+        }
+      }
+    },
+    {
+      "node_id": "S2",
+      "name": "Central Shelter — Civic Arena",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 1200,
+      "x": 9.0,
+      "y": 1.0,
+      "metadata": {
+        "current_occupancy": 300,
+        "shelter_type": "arena",
+        "current_supplies": {
+          "water_liters": 3000,
+          "food_rations": 2200,
+          "medical_kits": 18,
+          "essential_meds_doses": 600,
+          "blankets": 450,
+          "hygiene_kits": 300
+        }
+      }
+    },
+    {
+      "node_id": "S3",
+      "name": "East Shelter — Regional Complex",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 1500,
+      "x": 9.0,
+      "y": -1.0,
+      "metadata": {
+        "current_occupancy": 100,
+        "shelter_type": "complex",
+        "current_supplies": {
+          "water_liters": 5000,
+          "food_rations": 3500,
+          "medical_kits": 30,
+          "essential_meds_doses": 1000,
+          "blankets": 700,
+          "hygiene_kits": 500
+        }
+      }
+    },
+    {
+      "node_id": "S4",
+      "name": "South Shelter — Hilltop Campus",
+      "node_type": "shelter",
+      "population": 0,
+      "shelter_capacity": 1000,
+      "x": 9.0,
+      "y": -2.8,
+      "metadata": {
+        "current_occupancy": 250,
+        "shelter_type": "campus",
+        "current_supplies": {
+          "water_liters": 2500,
+          "food_rations": 1800,
+          "medical_kits": 15,
+          "essential_meds_doses": 500,
+          "blankets": 350,
+          "hygiene_kits": 250
+        }
+      }
+    }
+  ],
+  "roads": [
+    {"road_id": "R_A1_J1", "source_id": "A1", "target_id": "J1", "capacity": 800, "name": "North Levee Expressway", "distance": 3.2, "travel_time_min": 10.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A1_J2", "source_id": "A1", "target_id": "J2", "capacity": 600, "name": "Riverside Parkway", "distance": 2.8, "travel_time_min": 12.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A2_J2", "source_id": "A2", "target_id": "J2", "capacity": 900, "name": "Downtown Arterial", "distance": 2.5, "travel_time_min": 9.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A2_J3", "source_id": "A2", "target_id": "J3", "capacity": 800, "name": "Central Boulevard", "distance": 2.4, "travel_time_min": 9.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A3_J3", "source_id": "A3", "target_id": "J3", "capacity": 650, "name": "Harbor Expressway", "distance": 2.6, "travel_time_min": 11.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A3_J4", "source_id": "A3", "target_id": "J4", "capacity": 450, "name": "Port Transit Link", "distance": 3.0, "travel_time_min": 13.0, "is_active": true, "metadata": {"safety_status": "unverified_report", "verified": false, "notes": "Local spotter reported water logging; scout confirmation pending."}},
+    {"road_id": "R_A4_J4", "source_id": "A4", "target_id": "J4", "capacity": 750, "name": "Lowland Causeway", "distance": 2.7, "travel_time_min": 10.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A4_J5", "source_id": "A4", "target_id": "J5", "capacity": 500, "name": "East Marsh Connector", "distance": 3.1, "travel_time_min": 14.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_A5_J5", "source_id": "A5", "target_id": "J5", "capacity": 800, "name": "Valley Gateway", "distance": 2.9, "travel_time_min": 11.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J1_J6", "source_id": "J1", "target_id": "J6", "capacity": 750, "name": "North Ridgeway Bridge", "distance": 3.5, "travel_time_min": 12.0, "is_active": true, "metadata": {"safety_status": "hazard_avoid", "verified": true, "notes": "Active flood surge nearby; marked hazard avoidance."}},
+    {"road_id": "R_J2_J6", "source_id": "J2", "target_id": "J6", "capacity": 450, "name": "Riverfront Overpass", "distance": 2.8, "travel_time_min": 11.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J2_J7", "source_id": "J2", "target_id": "J7", "capacity": 850, "name": "Metro River Bridge", "distance": 3.0, "travel_time_min": 10.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J3_J7", "source_id": "J3", "target_id": "J7", "capacity": 600, "name": "Central Cross-Viaduct", "distance": 2.5, "travel_time_min": 9.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J3_J8", "source_id": "J3", "target_id": "J8", "capacity": 650, "name": "Midtown Transit Way", "distance": 2.7, "travel_time_min": 10.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J4_J8", "source_id": "J4", "target_id": "J8", "capacity": 700, "name": "East Transit Arterial", "distance": 3.0, "travel_time_min": 11.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J4_J9", "source_id": "J4", "target_id": "J9", "capacity": 450, "name": "Southside Bypass", "distance": 3.2, "travel_time_min": 13.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J5_J9", "source_id": "J5", "target_id": "J9", "capacity": 750, "name": "Valley Ridge Freeway", "distance": 3.4, "travel_time_min": 12.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J7_J10", "source_id": "J7", "target_id": "J10", "capacity": 700, "name": "Central Expressway Bridge", "distance": 2.2, "travel_time_min": 8.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J8_J10", "source_id": "J8", "target_id": "J10", "capacity": 650, "name": "East Ridge Link", "distance": 2.3, "travel_time_min": 8.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J6_S1", "source_id": "J6", "target_id": "S1", "capacity": 1100, "name": "Stadium Approach Highway", "distance": 2.0, "travel_time_min": 7.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J6_S2", "source_id": "J6", "target_id": "S2", "capacity": 400, "name": "Civic North Link", "distance": 2.5, "travel_time_min": 9.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J10_S2", "source_id": "J10", "target_id": "S2", "capacity": 800, "name": "Civic Main Access", "distance": 1.8, "travel_time_min": 6.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J10_S3", "source_id": "J10", "target_id": "S3", "capacity": 600, "name": "Sports Complex Northway", "distance": 2.0, "travel_time_min": 7.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J8_S3", "source_id": "J8", "target_id": "S3", "capacity": 700, "name": "Sports Complex Eastway", "distance": 2.2, "travel_time_min": 8.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J9_S3", "source_id": "J9", "target_id": "S3", "capacity": 450, "name": "Complex South Ramp", "distance": 2.4, "travel_time_min": 9.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}},
+    {"road_id": "R_J9_S4", "source_id": "J9", "target_id": "S4", "capacity": 850, "name": "Hilltop Campus Freeway", "distance": 2.1, "travel_time_min": 7.0, "is_active": true, "metadata": {"safety_status": "clear", "verified": true}}
+  ]
+}

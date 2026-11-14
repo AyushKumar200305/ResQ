@@ -1,0 +1,239 @@
+/* ResQ — Emergency-Management Control-Center Theme */
+
+:root {
+    --resq-bg: #0b0f17;
+    --resq-surface: #111827;
+    --resq-surface-alt: #161f30;
+    --resq-border: #263244;
+    --resq-text: #f1f5f9;
+    --resq-muted: #94a3b8;
+    --resq-subtle: #64748b;
+    --resq-safe: #22c55e;
+    --resq-warn: #f59e0b;
+    --resq-crit: #ef4444;
+    --resq-info: #38bdf8;
+}
+
+html, body, [class*="css"] {
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: var(--resq-text);
+}
+
+.stApp {
+    background-color: var(--resq-bg);
+}
+
+/* Tighten vertical rhythm */
+.block-container {
+    padding-top: 1.4rem;
+    padding-bottom: 2.5rem;
+    max-width: 1440px;
+}
+
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background-color: #0e141f;
+    border-right: 1px solid var(--resq-border);
+}
+
+[data-testid="stSidebar"] .stMarkdown h1,
+[data-testid="stSidebar"] .stMarkdown h2,
+[data-testid="stSidebar"] .stMarkdown h3 {
+    color: var(--resq-text);
+    letter-spacing: -0.01em;
+}
+
+/* Control-center top header bar */
+.resq-header {
+    background-color: var(--resq-surface);
+    border: 1px solid var(--resq-border);
+    border-radius: 6px;
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.resq-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.resq-title {
+    font-size: 1.28rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--resq-text);
+    margin: 0;
+}
+
+.resq-subtitle {
+    font-size: 0.82rem;
+    color: var(--resq-muted);
+    margin: 0;
+}
+
+.resq-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.resq-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}
+
+.resq-badge-safe {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.35);
+}
+
+.resq-badge-warn {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+.resq-badge-crit {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+.resq-badge-info {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.35);
+}
+
+/* Telemetry KPI Cards */
+.resq-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 1024px) {
+    .resq-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 580px) {
+    .resq-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.resq-kpi-card {
+    background-color: var(--resq-surface);
+    border: 1px solid var(--resq-border);
+    border-top: 2px solid var(--resq-border);
+    border-radius: 6px;
+    padding: 0.8rem 0.95rem;
+}
+
+.resq-kpi-card.tone-safe { border-top-color: var(--resq-safe); }
+.resq-kpi-card.tone-warn { border-top-color: var(--resq-warn); }
+.resq-kpi-card.tone-crit { border-top-color: var(--resq-crit); }
+.resq-kpi-card.tone-info { border-top-color: var(--resq-info); }
+.resq-kpi-card.tone-neutral { border-top-color: var(--resq-subtle); }
+
+.resq-kpi-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--resq-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.3rem;
+}
+
+.resq-kpi-value {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--resq-text);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+}
+
+.resq-kpi-sub {
+    font-size: 0.76rem;
+    color: var(--resq-subtle);
+    margin-top: 0.28rem;
+}
+
+/* Section containers */
+.resq-panel {
+    background-color: var(--resq-surface);
+    border: 1px solid var(--resq-border);
+    border-radius: 6px;
+    padding: 0.95rem 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.resq-section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--resq-text);
+    letter-spacing: -0.01em;
+    margin: 0 0 0.65rem 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--resq-border);
+}
+
+/* Buttons */
+.stButton > button {
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.84rem;
+    border: 1px solid var(--resq-border);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.stButton > button[kind="primary"] {
+    background-color: #1d4ed8;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background-color: #2563eb;
+    border-color: #3b82f6;
+}
+
+/* Clean dataframe and tabs styling */
+[data-testid="stDataFrame"] {
+    border: 1px solid var(--resq-border);
+    border-radius: 6px;
+}
+
+.stTabs [data-baseweb="tab-list"] {
+    gap: 0.4rem;
+    border-bottom: 1px solid var(--resq-border);
+}
+
+.stTabs [data-baseweb="tab"] {
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 0.45rem 0.9rem;
+}
+
+code {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 0.85em;
+}

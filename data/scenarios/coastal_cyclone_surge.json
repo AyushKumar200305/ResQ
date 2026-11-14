@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "network_id": "coastal-cyclone-surge",
+  "name": "Coastal Cyclone Surge",
+  "description": "Coastal peninsula evacuation featuring parallel causeways and inland shelter capacity limits.",
+  "metadata": {
+    "preset": true,
+    "hazard": "Category 4 Cyclone Storm Surge"
+  },
+  "nodes": [
+    {"node_id": "A_ISL", "name": "Barrier Island", "node_type": "affected_area", "population": 1200, "shelter_capacity": 0, "x": 0.0, "y": 2.2, "metadata": {}},
+    {"node_id": "A_PRT", "name": "Port Basin", "node_type": "affected_area", "population": 850, "shelter_capacity": 0, "x": 0.0, "y": -0.2, "metadata": {}},
+    {"node_id": "A_COV", "name": "South Cove", "node_type": "affected_area", "population": 650, "shelter_capacity": 0, "x": 0.0, "y": -2.4, "metadata": {}},
+    {"node_id": "J_GAT", "name": "Causeway Gate", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 3.2, "y": 1.6, "metadata": {}},
+    {"node_id": "J_XRD", "name": "Inland Crossroad", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 3.2, "y": -1.4, "metadata": {}},
+    {"node_id": "J_Mrg", "name": "Foothill Merge", "node_type": "junction", "population": 0, "shelter_capacity": 0, "x": 6.2, "y": 0.2, "metadata": {}},
+    {"node_id": "S_EXP", "name": "Inland Expo Center", "node_type": "shelter", "population": 0, "shelter_capacity": 1000, "x": 9.0, "y": 1.8, "metadata": {}},
+    {"node_id": "S_UNI", "name": "University Dome", "node_type": "shelter", "population": 0, "shelter_capacity": 1100, "x": 9.0, "y": -1.8, "metadata": {}}
+  ],
+  "roads": [
+    {"road_id": "R_CSW_MAIN", "source_id": "A_ISL", "target_id": "J_GAT", "capacity": 650, "name": "Causeway Express", "distance": 4.0, "travel_time_min": 14.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_CSW_AUX", "source_id": "A_ISL", "target_id": "J_GAT", "capacity": 350, "name": "Causeway Service Lane", "distance": 5.4, "travel_time_min": 18.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_PRT_GAT", "source_id": "A_PRT", "target_id": "J_GAT", "capacity": 400, "name": "Harbor North Ramp", "distance": 2.6, "travel_time_min": 9.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_PRT_XRD", "source_id": "A_PRT", "target_id": "J_XRD", "capacity": 550, "name": "Freight Corridor", "distance": 3.1, "travel_time_min": 11.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_COV_XRD", "source_id": "A_COV", "target_id": "J_XRD", "capacity": 650, "name": "Coastal Highway", "distance": 3.4, "travel_time_min": 12.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_GAT_MRG", "source_id": "J_GAT", "target_id": "J_Mrg", "capacity": 1200, "name": "Inland Turnpike", "distance": 4.2, "travel_time_min": 15.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_XRD_MRG", "source_id": "J_XRD", "target_id": "J_Mrg", "capacity": 1000, "name": "Foothill Bypass", "distance": 3.9, "travel_time_min": 14.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_MRG_EXP", "source_id": "J_Mrg", "target_id": "S_EXP", "capacity": 1300, "name": "Expo Access Road", "distance": 2.1, "travel_time_min": 7.0, "is_active": true, "metadata": {}},
+    {"road_id": "R_MRG_UNI", "source_id": "J_Mrg", "target_id": "S_UNI", "capacity": 950, "name": "University Parkway", "distance": 2.6, "travel_time_min": 9.0, "is_active": true, "metadata": {}}
+  ]
+}

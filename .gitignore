@@ -1,0 +1,69 @@
+# ==============================================================================
+# ResQ — Dynamic Disaster Evacuation & Resource Routing System
+# Git Exclusions
+# ==============================================================================
+
+# Python Bytecode, Caches & Test Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.sqlite3
+*.db
+
+# Virtual Environments & Backups
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.bak
+*.backup
+
+# Frontend Dependencies, Bundles & Build Artifacts
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+frontend/dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment Configurations & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE, OS & System Metadata
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary Scratch Scripts & Working Checkpoints
+scratch/
+*.log
+logs/
+
+# Safety Checkpoint Backup (Preserved permanently on disk, excluded from Git)
+frontend/src_backup_checkpoint/
+
+# Internal Viva and Examination Materials (Excluded from publication)
+VIVA_PREPARATION.md
