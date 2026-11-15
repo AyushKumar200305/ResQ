@@ -161,7 +161,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       } catch (err: unknown) {
         console.error("Initialization error:", err);
-        setError("Unable to connect to FastAPI backend at http://localhost:8000. Please ensure the server is running.");
+        setError(`Unable to connect to FastAPI backend at ${api.getBaseUrl()}. Please ensure the server is running.`);
       } finally {
         setIsLoading(false);
         setLoadingMessage("");

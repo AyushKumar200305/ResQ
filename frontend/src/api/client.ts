@@ -26,7 +26,14 @@ import type {
   WaveStep,
 } from "../types/api";
 
-const API_BASE = "http://localhost:8000";
+const rawEnvUrl = String(import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "").trim();
+const normalizedEnvUrl = rawEnvUrl
+  ? rawEnvUrl.startsWith("http://") || rawEnvUrl.startsWith("https://")
+    ? rawEnvUrl.replace(/\/+$/, "")
+    : `https://${rawEnvUrl.replace(/\/+$/, "")}`
+  : "";
+
+export const API_BASE = normalizedEnvUrl || (import.meta.env.DEV ? "http://localhost:8000" : "");
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
@@ -253,11 +260,20 @@ export const api = {
       }
     ),
 
-  // Export URLs
-  exportJsonUrl: `${API_BASE}/api/reports/json`,
-  exportCsvRoadsUrl: `${API_BASE}/api/reports/csv/roads`,
-  exportCsvScenariosUrl: `${API_BASE}/api/reports/csv/scenarios`,
-  exportPdfUrl: `${API_BASE}/api/reports/pdf`,
+  // Base URL & Export URLs
+  getBaseUrl: () => API_BASE || (typeof window !== "undefined" ? window.location.origin : "http://localhost:8000"),
+  get exportJsonUrl() {
+    return `${API_BASE}/api/reports/json`;
+  },
+  get exportCsvRoadsUrl() {
+    return `${API_BASE}/api/reports/csv/roads`;
+  },
+  get exportCsvScenariosUrl() {
+    return `${API_BASE}/api/reports/csv/scenarios`;
+  },
+  get exportPdfUrl() {
+    return `${API_BASE}/api/reports/pdf`;
+  },
 
   // File Download Helper
   downloadFile: async (url: string, filename: string) => {

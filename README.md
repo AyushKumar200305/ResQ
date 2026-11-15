@@ -198,3 +198,108 @@ npm run build
 streamlit run app.py
 ```
 *Runs on `http://localhost:8501` without requiring FastAPI or Node.js.*
+
+---
+
+## 7. Production Deployment on Render
+
+ResQ is fully configured for deployment on [Render](https://render.com) using a decoupled two-service architecture that operates 100% within Render's Free Tier ($0.00/month).
+
+### Architecture Overview
+
+```
+                      ┌────────────────────────────────────────┐
+                      │              Web Browser               │
+                      │         (Desktop / Mobile)             │
+                      └──────────────────┬─────────────────────┘
+                                         │
+                 ┌───────────────────────┴───────────────────────┐
+                 │                                               │
+                 ▼                                               ▼
+     ┌───────────────────────┐                       ┌───────────────────────┐
+     │     resq-frontend     │                       │     resq-backend      │
+     │  Render Static Site   │   REST / JSON         │   Render Web Service  │
+     │  (React 19 + Vite)    │ ────────────────────> │   (FastAPI + Python)  │
+     │  Global CDN + Rewrites│                       │   In-Memory Solvers   │
+     └───────────────────────┘                       └───────────────────────┘
+```
+
+* **No External Database / Redis Required:** ResQ maintains state deterministically in-memory with thread synchronization (`StateManager`) loaded from standardized benchmark scenario presets.
+* **Zero Infrastructure Cost:** Fits entirely within Render Free Tier limits.
+* **CORS Pre-Configured:** FastAPI dynamically authorizes all `*.onrender.com` origins automatically via regular expression matching.
+
+### Option A: 1-Click Render Blueprint Deployment (Recommended)
+
+ResQ includes a ready-to-use [`render.yaml`](./render.yaml) Blueprint specification at the root of the repository.
+
+1. Navigate to the Render Blueprint Deployer:
+   **[Deploy ResQ to Render](https://render.com/deploy?repo=https://github.com/AyushKumar200305/ResQ)**
+2. Connect your GitHub account and authorize access to `AyushKumar200305/ResQ`.
+3. Render reads `render.yaml` and will automatically configure both services:
+   * `resq-backend` (Web Service, Python 3.11.9)
+   * `resq-frontend` (Static Site, Node.js, SPA route rewrite `/* -> /index.html`)
+4. Click **Apply**. Both services will build and deploy automatically.
+
+### Option B: Manual Setup via Render Dashboard
+
+If you prefer configuring services individually in the Render Dashboard:
+
+#### 1. Deploy the Backend Web Service (`resq-backend`)
+* Click **New +** $\rightarrow$ **Web Service**.
+* Connect repository: `https://github.com/AyushKumar200305/ResQ`.
+* Set configuration parameters:
+  * **Name:** `resq-backend` (or your chosen name)
+  * **Region:** Oregon (US West) or closest region
+  * **Branch:** `main`
+  * **Runtime:** `Python 3`
+  * **Build Command:** `pip install -r requirements.txt`
+  * **Start Command:** `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+  * **Instance Type:** `Free`
+* In **Advanced**:
+  * **Health Check Path:** `/api/health`
+  * **Environment Variables:**
+    * `PYTHON_VERSION`: `3.11.9`
+    * `CORS_ORIGINS`: `https://resq-frontend.onrender.com` *(or your frontend URL)*
+* Click **Create Web Service**. Note the assigned URL (e.g., `https://resq-backend.onrender.com`).
+
+#### 2. Deploy the Frontend Static Site (`resq-frontend`)
+* Click **New +** $\rightarrow$ **Static Site**.
+* Connect repository: `https://github.com/AyushKumar200305/ResQ`.
+* Set configuration parameters:
+  * **Name:** `resq-frontend`
+  * **Branch:** `main`
+  * **Root Directory:** `frontend`
+  * **Build Command:** `npm install && npm run build`
+  * **Publish Directory:** `dist`
+* In **Redirects / Rewrites**:
+  * **Type:** `Rewrite`
+  * **Source:** `/*`
+  * **Destination:** `/index.html`
+* In **Environment Variables**:
+  * `VITE_API_URL`: `https://resq-backend.onrender.com` *(paste your backend URL from Step 1)*
+* Click **Create Static Site**.
+
+### Environment Variables Reference
+
+| Service | Variable Name | Purpose | Example / Default |
+| :--- | :--- | :--- | :--- |
+| `resq-backend` | `PORT` | Dynamic HTTP port assigned by Render | Automatically set by Render |
+| `resq-backend` | `PYTHON_VERSION` | Python runtime version pinned for build | `3.11.9` |
+| `resq-backend` | `CORS_ORIGINS` | Comma-separated list of allowed custom domains | `https://resq-frontend.onrender.com` |
+| `resq-frontend`| `VITE_API_URL` | Base HTTP endpoint of the deployed FastAPI backend | `https://resq-backend.onrender.com` |
+
+### Live Operational Verification
+
+Once deployed, verify end-to-end functionality using the following endpoints:
+
+1. **Backend Health Check:**
+   ```bash
+   curl -i https://<your-backend-url>.onrender.com/api/health
+   # Expected: HTTP 200 OK {"status": "healthy", "service": "...", ...}
+   ```
+2. **Interactive OpenAPI Documentation:**
+   Visit `https://<your-backend-url>.onrender.com/docs` to test solver endpoints directly via Swagger UI.
+3. **Frontend Application:**
+   Visit `https://<your-frontend-url>.onrender.com`. Ensure the network topology loads, scenario selection works, algorithms execute, and PDF demonstration reports generate cleanly.
+
+*Note on Free Tier Sleep:* On Render's Free tier, backend web services spin down after 15 minutes of inactivity. When accessed after inactivity, the first request may take 30–50 seconds while the container initializes; all subsequent interactions respond instantaneously with sub-millisecond solver throughput.

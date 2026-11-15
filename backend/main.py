@@ -1,6 +1,7 @@
 """Main FastAPI application entry point for the ResQ Disaster Evacuation Optimizer."""
 
 import logging
+import os
 import sys
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,7 +44,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Configure CORS for local Vite/React development server
+# Configure CORS for local Vite/React development server and deployed environments
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -53,9 +54,15 @@ origins = [
     "http://127.0.0.1:8000",
 ]
 
+# Allow custom CORS origins from environment (comma-separated)
+env_origins = os.getenv("CORS_ORIGINS", "")
+if env_origins:
+    origins.extend([o.strip() for o in env_origins.split(",") if o.strip()])
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"^https://.*\.onrender\.com$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -140,4 +147,5 @@ def root() -> dict[str, str]:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
