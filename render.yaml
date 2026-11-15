@@ -22,13 +22,11 @@ services:
         value: https://resq-frontend.onrender.com
 
   # ----------------------------------------------------------------------------
-  # 2. React + TypeScript + Vite Frontend Static Site
+  # 2. React + TypeScript + Vite Frontend Static Site (Served via Global CDN)
   # ----------------------------------------------------------------------------
   - type: web
     name: resq-frontend
     runtime: static
-    region: oregon
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
