@@ -26,7 +26,28 @@ import type {
   WaveStep,
 } from "../types/api";
 
-const rawEnvUrl = String(import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "").trim();
+const getCustomBackendUrl = (): string => {
+  if (typeof window !== "undefined") {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromQuery = params.get("api");
+      if (fromQuery) {
+        window.localStorage.setItem("resq_backend_url", fromQuery);
+        return fromQuery;
+      }
+      return window.localStorage.getItem("resq_backend_url") || "";
+    } catch {
+      return "";
+    }
+  }
+  return "";
+};
+
+const rawEnvUrl = String(
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  getCustomBackendUrl()
+).trim();
 const normalizedEnvUrl = rawEnvUrl
   ? rawEnvUrl.startsWith("http://") || rawEnvUrl.startsWith("https://")
     ? rawEnvUrl.replace(/\/+$/, "")
