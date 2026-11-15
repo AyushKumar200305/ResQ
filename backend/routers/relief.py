@@ -1,5 +1,9 @@
 """FastAPI router for Disaster Evacuation Planning and Relief Management endpoints."""
 
+from __future__ import annotations
+
+from typing import Any
+
 from fastapi import APIRouter, HTTPException, Query
 
 from resq.domain.enums import NodeType
